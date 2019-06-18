@@ -57,12 +57,6 @@ class MyApp extends App{
             <Container>
                 <Provider store={reduxStore}>
                     <Layout>
-                        <Link href='/'>
-                            <a>home</a>
-                        </Link>
-                        <Link href='/detail'>
-                            <a>detail</a>
-                        </Link>
                         {loading?<PageLoading />:null}
                         <Component {...pageProps} />
                     </Layout>

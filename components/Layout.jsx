@@ -3,12 +3,10 @@ import {Layout,Icon,Input,Avatar,Tooltip,Dropdown,Menu} from 'antd'
 const { Header, Content, Footer } = Layout;
 import Container from '../components/Container'
 import {connect} from 'react-redux'
-import getConfig from 'next/config'
 import {logout} from '../store/action/user'
 import {withRouter} from 'next/router'
 import Link from 'next/link'
 
-const {publicRuntimeConfig} = getConfig()
 
 
 const githubIconStyle = {
@@ -71,14 +69,19 @@ const MyLayout = ({children,user,logout,router}) => {
                 </Container>
             </Header>
             <Content>
+                <div className="content">
                 <Container>
                     {children}
                 </Container>
+                </div>
             </Content>
             <Footer>
-                <div>c10342</div>
+                <div style={{textAlign:'center'}}>c10342</div>
             </Footer>
             <style jsx>{`
+            .content {
+                min-height: 100%;
+              }
             .header-inner{
                 display:flex;
                 justify-content:space-between;
@@ -96,10 +99,13 @@ const MyLayout = ({children,user,logout,router}) => {
                 height:100%;
             }
             .ant-layout{
-                height:100%;
+                min-height:100%;
             }
             .ant-layout-header{
                 margin:0;
+            }
+            .ant-layout-content{
+                background-color:#fff;
             }
             `}</style>
         </Layout>
