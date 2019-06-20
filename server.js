@@ -59,7 +59,7 @@ app.prepare().then(() => {
         ctx.respond = false
     })
 
-    server.listen('3000', () => {
-        console.log('localhost:3000')
+    server.listen('9092','172.18.242.102', () => {
+        console.log('172.18.242.102:9092')
     })
 })
