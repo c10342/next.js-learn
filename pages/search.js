@@ -2,10 +2,13 @@ import { withRouter } from 'next/router'
 const { request } = require('../lib/api')
 import { List, Row, Col, Pagination } from 'antd'
 import Link from 'next/link'
-import React, { memo } from 'react'
+import React, { memo,useEffect } from 'react'
 import Repo from '../components/Repo'
+import {cacheArray,get, cache,cacheWithName} from '../lib/cache'
 
 const pageSize = 10
+
+const isServer = typeof window === 'undefined'
 
 const LANGUAGES = ['JavaScript', 'HTML', 'CSS', 'TypeScript', 'Java', 'Rust']
 const SORT_TYPES = [
@@ -61,9 +64,28 @@ let FilterLink = memo(({ name, query, lang, sort, order,page }) => {
     )
 })
 
+function makeQuery({ query, sort, lang, order, page }){
+    let queryString = `?q=${query}`
+        if (lang) queryString += `+language:${lang}`
+        if (sort) queryString += `&sort=${sort}&order=${order || 'desc'}`
+        if (page) queryString += `&page=${page}`
+
+        queryString+=`&per_page=${pageSize}`
+
+        return queryString
+}
+
 const Search = ({ router, repos }) => {
     const { page, ...querys } = router.query
     const { lang, sort, order } = router.query
+
+    useEffect(()=>{
+        if(!isServer){
+            const queryString = makeQuery(router.query)
+            cacheArray(repos.items)
+            cacheWithName(queryString,repos)
+        }
+    })
     return (
         <div className="root">
             <Row gutter={20}>
@@ -170,12 +192,20 @@ Search.getInitialProps = async ({ router, ctx }) => {
                 },
             }
         }
-        let queryString = `?q=${query}`
-        if (lang) queryString += `+language:${lang}`
-        if (sort) queryString += `&sort=${sort}&order=${order || 'desc'}`
-        if (page) queryString += `&page=${page}`
+        // let queryString = `?q=${query}`
+        // if (lang) queryString += `+language:${lang}`
+        // if (sort) queryString += `&sort=${sort}&order=${order || 'desc'}`
+        // if (page) queryString += `&page=${page}`
 
-        queryString+=`&per_page=${pageSize}`
+        // queryString+=`&per_page=${pageSize}`
+        let queryString = makeQuery(ctx.query)
+        if(!isServer){
+            if(get(queryString)){
+                return {
+                    repos:get(queryString)
+                }
+            }
+        }
 
         const { status, data } = await request({ url: `/github/search/repositories${queryString}`, req: ctx.req, res: ctx.res })
         if (status === 200) {

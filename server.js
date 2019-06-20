@@ -8,6 +8,8 @@ const koaBody = require('koa-body')
 
 const next = require('next')
 
+const atob = require('atob')
+
 const RedisSessionStroe = require('./server/session-store')
 
 const Redis = require('ioredis')
@@ -26,6 +28,11 @@ const redisClient = new Redis()
 
 // 等待next编译完成
 app.prepare().then(() => {
+
+    // 给node增加全局方法，atob是把base64格式的文字转换回来
+    // window自带，node没有，这里为了兼容前端，所以增加全局方法
+    global.atob = atob
+
     const server = new Koa()
     const router = new Router()
 
